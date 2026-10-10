@@ -8,8 +8,6 @@ from app.models.driver import Driver
 from app.models.ride import Ride
 from app.routes import auth, drivers, rides
 
-Base.metadata.create_all(bind=engine)
-
 app = FastAPI(
     title="SwiftRide API",
     description="Full-stack ride-hailing platform",
@@ -21,6 +19,7 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:5173",
         "http://127.0.0.1:5173",
+        "https://swiftride-dwcnalfio-c-8b09.vercel.app",
     ],
     allow_credentials=True,
     allow_methods=["*"],
@@ -38,3 +37,8 @@ def root():
         "status": "ok",
         "message": "SwiftRide API is running",
     }
+
+
+@app.get("/health")
+def health():
+    return {"status": "healthy"}
