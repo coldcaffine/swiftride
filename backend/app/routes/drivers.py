@@ -57,7 +57,8 @@ def register_driver(
         | (Driver.vehicle_plate == data.vehicle_plate.strip().upper())
     ).first()
     if existing:
-        raise HTTPException(409, "Driver, license, or plate already registered")
+        raise HTTPException(
+            409, "Driver, license, or plate already registered")
 
     driver = Driver(
         user_id=current_user.id,
@@ -83,6 +84,21 @@ def get_my_driver_profile(
     db: Session = Depends(get_db),
 ):
     return get_driver(current_user, db)
+
+
+@router.get("/me/assigned-rides", response_model=list[RideResponse])
+def get_my_assigned_rides(
+    current_user: User = Depends(get_logged_in_user),
+    db: Session = Depends(get_db),
+):
+    driver = get_driver(current_user, db)
+
+    return (
+        db.query(Ride)
+        .filter(Ride.driver_id == driver.id)
+        .order_by(Ride.created_at.desc())
+        .all()
+    )
 
 
 @router.patch("/availability")
